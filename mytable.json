@@ -1,0 +1,44 @@
+{
+    "name": "mytable",
+    "schema": {
+        "hashkey": {
+            "name": "myhashkey",
+            "type": "STRING"
+        },
+        "rangekey": {
+            "name": "myrangekey",
+            "type": "NUMBER"
+        },
+        "fields": [
+            {
+                "name": "field1",
+                "type": "BINARY"
+            },
+            {
+                "name": "field2",
+                "type": "STRING_SET"
+            },
+            {
+                "name": "field3",
+                "type": "NUMBER_SET"
+            }
+        ]
+    },
+    "throughput": {
+        "read": 1,
+        "write": 1
+    },
+    "indexes": [
+        {
+            "name": "index1",
+            "parts": {
+                "hashkey": "myhashkey",
+                "rangekey": "myrangekey"
+            },
+            "fields": [
+                "field2",
+                "field3"
+            ]
+        }
+    ]
+}

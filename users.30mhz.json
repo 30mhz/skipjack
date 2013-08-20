@@ -1,0 +1,17 @@
+{
+    "name": "mytable",
+    "schema": {
+        "hashkey": {
+            "name": "email_address",
+            "type": "STRING"
+        },
+        "rangekey": {
+            "name": "phone_number",
+            "type": "STRING"
+        }
+    },
+    "throughput": {
+        "read": 1,
+        "write": 1
+    }
+}

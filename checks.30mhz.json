@@ -1,0 +1,46 @@
+{
+    "name": "mytable",
+    "schema": {
+        "hashkey": {
+            "name": "email_address",
+            "type": "STRING"
+        },
+        "rangekey": {
+            "name": "check_id",
+            "type": "STRING"
+        }
+    },
+    "throughput": {
+        "read": 1,
+        "write": 1
+    },
+    "indexes": [
+        {
+            "name": "enabled_index",
+	        "attribute": {
+	            "name": "enabled",
+	            "type": "STRING"
+            }
+        },
+        {
+            "name": "frequency_index",
+	        "attribute": {
+	            "name": "frequency",
+	            "type": "NUMBER"
+            }
+        },
+        {
+            "name": "state_index",
+	        "attribute": {
+	            "name": "state",
+	            "type": "STRING"
+            }
+        }
+    ],
+    "transformations": [
+        {
+            "name": "locations",
+            "type": "STRING_SET"
+        }
+    ]
+}

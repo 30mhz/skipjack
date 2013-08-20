@@ -1,0 +1,63 @@
+{
+	"description" : "DynamoDB Table Definition Schema for Skipjack (highly migratory species)",
+	"schema" : {
+		"properties" : {
+			"name" : { "type" : "string" },
+			"schema" : {
+				"type" : "object",
+				"properties" : {
+					"hashkey" : { "type" : "string" },
+					"rangekey" : { "type" : "string" },
+					"required" : [ "hashkey" ]
+				}
+			},
+			"throughput" : {
+				"type" : "object",
+				"properties" : {
+					"read" : { "type" : "integer" },
+					"write" : { "type" : "integer" }
+				},
+				"required" : [ "read", "write" ]
+			},
+			"indexes" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"properties" : {
+						"name" : { "type" : "string" },
+						"attribute" : {
+							"type" : "object",
+							"properties" : {
+								"name" : { "type" : "string" },
+								"type" : { "type" : "string" }
+							},
+							"required" : [ "name", "type" ]
+						},
+						"fields" : {
+							"type" : "array",
+							"items" : {
+								"properties" : {
+									"name" : { "type" : "string" }
+								},
+								"required" : [ "name" ]
+							}
+						}
+					},
+					"required" : [ "name", "attribute" ]
+				}
+			},
+			"transformations" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"properties" : {
+						"name" : { "type" : "string" },
+						"type" : { "type" : "string" }
+					},
+					"required" : [ "name", "type" ]
+				}
+			}
+		},
+		"required" : [ "name", "schema" ]
+	}
+}

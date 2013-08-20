@@ -1,0 +1,17 @@
+{
+    "name": "mytable",
+    "schema": {
+        "hashkey": {
+            "name": "type",
+            "type": "STRING"
+        },
+        "rangekey": {
+            "name": "id",
+            "type": "STRING"
+        }
+    },
+    "throughput": {
+        "read": 1,
+        "write": 1
+    }
+}
