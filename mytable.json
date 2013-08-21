@@ -8,21 +8,7 @@
         "rangekey": {
             "name": "myrangekey",
             "type": "NUMBER"
-        },
-        "fields": [
-            {
-                "name": "field1",
-                "type": "BINARY"
-            },
-            {
-                "name": "field2",
-                "type": "STRING_SET"
-            },
-            {
-                "name": "field3",
-                "type": "NUMBER_SET"
-            }
-        ]
+        }
     },
     "throughput": {
         "read": 1,
@@ -39,6 +25,12 @@
                 "field2",
                 "field3"
             ]
+        }
+    ],
+    "transformations": [
+        {
+            "name": "transformation1",
+            "type": "STRING_SET"
         }
     ]
 }
