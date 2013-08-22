@@ -11,8 +11,8 @@
         }
     },
     "throughput": {
-        "read": 1,
-        "write": 1
+        "read": 2,
+        "write": 4
     },
     "indexes": [
         {
@@ -41,6 +41,14 @@
         {
             "name": "locations",
             "type": "STRING_SET"
+        },
+        {
+            "name": "period",
+            "type": "OBSOLETE"
+        },
+        {
+            "name": "max_recent_downs",
+            "type": "OBSOLETE"
         }
     ]
 }

@@ -219,18 +219,30 @@ class Meister:
 					item[index['name']] = Decimal(item[index['name']])
 				elif index['type'] == "NUMBER_SET":
 					fields = set()
-					for field in json.loads(item[index['name']]):
-						fields.add(Decimal(field))
+					try:
+						for field in json.loads(item[index['name']]):
+							fields.add(Decimal(field))
+					except TypeError:
+						for field in item[index['name']]:
+							fields.add(Decimal(field))
+
 					item[index['name']] = fields
-				if index['type'] == "STRING":
+				elif index['type'] == "STRING":
 					item[index['name']] = "{0}".format(item[index['name']])
 				elif index['type'] == "STRING_SET":
 					fields = set()
-					for field in json.loads(item[index['name']]):
-						fields.add("{0}".format(field))
-
+					try:
+						for field in json.loads(item[index['name']]):
+							fields.add("{0}".format(field))
+					except TypeError:
+						for field in item[index['name']]:
+							fields.add("{0}".format(field))
 					item[index['name']] = fields
-			destination.put_item(item)
+				elif index['type'] == "OBSOLETE":
+					if index['name'] in item:
+						del item[index['name']]
+
+			destination.put_item(item, overwrite=True)
 
 	def archive(self, args):
 		# lets get the origin table
