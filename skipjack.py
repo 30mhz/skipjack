@@ -182,6 +182,52 @@ class Meister:
 		for item in origin.scan():
 			destination.put_item(dict(item))
 
+	def _mold(self, item):
+		item = dict(item)
+
+		for key in item.keys():
+			if type(item[key]) is list:
+				item[key] = set(item[key])
+
+		for index in self.table_spec['indexes']:
+			if index['attribute']['type'] == "NUMBER":
+				item[index['attribute']['name']] = Decimal(item[index['attribute']['name']])
+			elif index['attribute']['type'] == "NUMBER_SET":
+				fields = []
+				for field in item[index['attribute']['name']]:
+					fields.append(Decimal(field))
+
+				item[index['attribute']['name']] = fields
+		for index in self.table_spec['transformations']:
+			if index['type'] == "NUMBER":
+				item[index['name']] = Decimal(item[index['name']])
+			elif index['type'] == "NUMBER_SET":
+				fields = set()
+				try:
+					for field in json.loads(item[index['name']]):
+						fields.add(Decimal(field))
+				except TypeError:
+					for field in item[index['name']]:
+						fields.add(Decimal(field))
+
+				item[index['name']] = fields
+			elif index['type'] == "STRING":
+				item[index['name']] = "{0}".format(item[index['name']])
+			elif index['type'] == "STRING_SET":
+				fields = set()
+				try:
+					for field in json.loads(item[index['name']]):
+						fields.add("{0}".format(field))
+				except TypeError:
+					for field in item[index['name']]:
+						fields.add("{0}".format(field))
+				item[index['name']] = fields
+			elif index['type'] == "OBSOLETE":
+				if index['name'] in item:
+					del item[index['name']]
+
+		return item
+
 	def migrate(self, args):
 		# lets get the origin table
 		try:
@@ -204,44 +250,7 @@ class Meister:
 		print "copying items from {0} to {1}".format(origin.table_name, destination.table_name)
 		for item in origin.scan():
 			# be sure to mold the fields into their proper shapes
-			item = dict(item)
-			for index in self.table_spec['indexes']:
-				if index['attribute']['type'] == "NUMBER":
-					item[index['attribute']['name']] = Decimal(item[index['attribute']['name']])
-				elif index['attribute']['type'] == "NUMBER_SET":
-					fields = []
-					for field in item[index['attribute']['name']]:
-						fields.append(Decimal(field))
-
-					item[index['attribute']['name']] = fields
-			for index in self.table_spec['transformations']:
-				if index['type'] == "NUMBER":
-					item[index['name']] = Decimal(item[index['name']])
-				elif index['type'] == "NUMBER_SET":
-					fields = set()
-					try:
-						for field in json.loads(item[index['name']]):
-							fields.add(Decimal(field))
-					except TypeError:
-						for field in item[index['name']]:
-							fields.add(Decimal(field))
-
-					item[index['name']] = fields
-				elif index['type'] == "STRING":
-					item[index['name']] = "{0}".format(item[index['name']])
-				elif index['type'] == "STRING_SET":
-					fields = set()
-					try:
-						for field in json.loads(item[index['name']]):
-							fields.add("{0}".format(field))
-					except TypeError:
-						for field in item[index['name']]:
-							fields.add("{0}".format(field))
-					item[index['name']] = fields
-				elif index['type'] == "OBSOLETE":
-					if index['name'] in item:
-						del item[index['name']]
-
+			item = self._mold(item)
 			destination.put_item(item, overwrite=True)
 
 	def archive(self, args):
@@ -274,38 +283,9 @@ class Meister:
 		
 		print "reading items from stdin to {0}".format(destination.table_name)
 		for line in sys.stdin:
-			item = dict(json.loads(line))
-			for key in item.keys():
-				if type(item[key]) is list:
-					item[key] = set(item[key])
-					
 			# be sure to mold the fields into their proper shapes
-			for index in self.table_spec['indexes']:
-				if index['attribute']['type'] == "NUMBER":
-					item[index['attribute']['name']] = Decimal(item[index['attribute']['name']])
-				elif index['attribute']['type'] == "NUMBER_SET":
-					fields = []
-					for field in item[index['attribute']['name']]:
-						fields.append(Decimal(field))
-
-					item[index['attribute']['name']] = fields
-			for index in self.table_spec['transformations']:
-				if index['type'] == "NUMBER":
-					item[index['name']] = Decimal(item[index['name']])
-				elif index['type'] == "NUMBER_SET":
-					fields = set()
-					for field in json.loads(item[index['name']]):
-						fields.add(Decimal(field))
-					item[index['name']] = fields
-				if index['type'] == "STRING":
-					item[index['name']] = "{0}".format(item[index['name']])
-				elif index['type'] == "STRING_SET":
-					fields = set()
-					for field in json.loads(item[index['name']]):
-						fields.add("{0}".format(field))
-
-					item[index['name']] = fields
-			destination.put_item(item)
+			item = self._mold(json.loads(line))
+			destination.put_item(item, overwrite=True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command',
