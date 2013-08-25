@@ -19,7 +19,7 @@
             "name": "enabled_index",
 	        "attribute": {
 	            "name": "enabled",
-	            "type": "STRING"
+	            "type": "NUMBER"
             }
         },
         {

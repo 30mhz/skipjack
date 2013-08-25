@@ -60,7 +60,7 @@ class Meister:
 		self.connection = boto.dynamodb2.connect_to_region(region, aws_access_key_id=access_key_id,
 															aws_secret_access_key=secret_access_key)
 
-		if 'specification_file' in args:
+		if 'specification_file' in args and not args['specification_file'] is None:
 			self.table_spec = json.load(open(os.path.join(Meister.__location__,
 														args['specification_file'])))
 
@@ -167,16 +167,8 @@ class Meister:
 		except Exception as e:
 			return "table {0} could not be found in {1}".format(args['origin_table'], self.region)
 
-		# now, create the destination_table (using create)
-		destination = Table.create(args['destination_table'],
-					schema=origin.schema,
-					indexes=origin.indexes,
-					connection=connection)
-		print "creating table {0}".format(destination.table_name)
-		while destination.describe()['Table']['TableStatus'] != 'ACTIVE':
-			print "		..."
-			time.sleep(5)
-		print "	table {0} created".format(destination.table_name)
+		# now, get the destination_table
+		destination = Table(args['destination_table'], connection=self.connection)
 		
 		print "copying items from {0} to {1}".format(origin.table_name, destination.table_name)
 		for item in origin.scan():
