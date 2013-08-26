@@ -1,54 +1,61 @@
 {
-    "name": "mytable",
-    "schema": {
-        "hashkey": {
-            "name": "email_address",
-            "type": "STRING"
-        },
-        "rangekey": {
-            "name": "check_id",
-            "type": "STRING"
-        }
-    },
-    "throughput": {
-        "read": 2,
-        "write": 4
-    },
-    "indexes": [
-        {
-            "name": "enabled_index",
-	        "attribute": {
-	            "name": "enabled",
-	            "type": "NUMBER"
-            }
-        },
-        {
-            "name": "frequency_index",
-	        "attribute": {
-	            "name": "frequency",
-	            "type": "NUMBER"
-            }
-        },
-        {
-            "name": "state_index",
-	        "attribute": {
-	            "name": "state",
-	            "type": "STRING"
-            }
-        }
-    ],
-    "transformations": [
-        {
-            "name": "locations",
-            "type": "STRING_SET"
-        },
-        {
-            "name": "period",
-            "type": "OBSOLETE"
-        },
-        {
-            "name": "max_recent_downs",
-            "type": "OBSOLETE"
-        }
-    ]
+	"name": "mytable",
+	"schema": {
+		"hashkey": {
+			"name": "email_address",
+			"type": "STRING"
+		},
+		"rangekey": {
+			"name": "check_id",
+			"type": "STRING"
+		}
+	},
+	"throughput": {
+		"read": 2,
+		"write": 4
+	},
+	"indexes": [
+		{
+			"name": "enabled_index",
+			"attribute": {
+				"name": "enabled",
+				"type": "NUMBER",
+				"translation": {
+					"yes": 1,
+					"no": 0
+				},
+				"default": 1
+			}
+		},
+		{
+			"name": "frequency_index",
+			"attribute": {
+				"name": "frequency",
+				"type": "NUMBER",
+				"default": 30
+			}
+		},
+		{
+			"name": "state_index",
+			"attribute": {
+				"name": "state",
+				"type": "STRING",
+				"default": "up"
+			}
+		}
+	],
+	"transformations": [
+		{
+			"name": "locations",
+			"type": "STRING_SET"
+		},
+		{
+			"name": "period",
+			"type": "OBSOLETE"
+		},
+		{
+			"name": "max_recent_downs",
+			"type": "OBSOLETE"
+		}
+	]
 }

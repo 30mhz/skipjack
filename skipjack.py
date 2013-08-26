@@ -182,14 +182,31 @@ class Meister:
 				item[key] = set(item[key])
 
 		for index in self.table_spec['indexes']:
-			if index['attribute']['type'] == "NUMBER":
-				item[index['attribute']['name']] = Decimal(item[index['attribute']['name']])
-			elif index['attribute']['type'] == "NUMBER_SET":
-				fields = []
-				for field in item[index['attribute']['name']]:
-					fields.append(Decimal(field))
-
-				item[index['attribute']['name']] = fields
+			attribute = index['attribute']
+			if attribute['type'] == "NUMBER":
+				if 'translation' in attribute:
+					if item[attribute['name']] in attribute['translation']:
+						item[attribute['name']] = Decimal(attribute['translation'][item[attribute['name']]])
+					elif 'default' in attribute:
+						item[attribute['name']] = Decimal(attribute['default'])
+				else:
+					try:
+						item[attribute['name']] = Decimal(item[attribute['name']])
+					except:
+						if 'default' in attribute:
+							item[attribute['name']] = Decimal(item[attribute['default']])
+			elif attribute['type'] == "STRING":
+				if 'translation' in attribute:
+					if item[attribute['name']] in attribute['translation']:
+						item[attribute['name']] = "{0}".format(attribute['translation'][item[attribute['name']]])
+					elif 'default' in attribute:
+						item[attribute['name']] = "{0}".format(attribute['default'])
+				else:
+					try:
+						item[attribute['name']] = "{0}".format(item[attribute['name']])
+					except:
+						if 'default' in attribute:
+							item[attribute['name']] = "{0}".format(attribute['default'])
 		for index in self.table_spec['transformations']:
 			if index['type'] == "NUMBER":
 				item[index['name']] = Decimal(item[index['name']])
