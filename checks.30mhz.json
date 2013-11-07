@@ -11,8 +11,8 @@
 		}
 	},
 	"throughput": {
-		"read": 2,
-		"write": 4
+		"read": 15,
+		"write": 70
 	},
 	"indexes": [
 		{

@@ -105,22 +105,23 @@ class Meister:
 		for index in table.indexes:
 			indexes[index.name] = index
 
-		for index in self.table_spec['indexes']:
-			if index['name'] in indexes:
-				i_type = eval(Meister.types.format(index['attribute']['type']))
-				i_name = index['attribute']['name']
-				if i_name != indexes[index['name']].parts[1].name or \
-						i_type != indexes[index['name']].parts[1].data_type:
-					return "index {0} in table {1} has type or name mismatch".format(index['name'],
+		if 'indexes' in self.table_spec:
+			for index in self.table_spec['indexes']:
+				if index['name'] in indexes:
+					i_type = eval(Meister.types.format(index['attribute']['type']))
+					i_name = index['attribute']['name']
+					if i_name != indexes[index['name']].parts[1].name or \
+							i_type != indexes[index['name']].parts[1].data_type:
+						return "index {0} in table {1} has type or name mismatch".format(index['name'],
 																					table.table_name)
-				del(indexes[index['name']])
-			else:
-				return "index {0} in table {1} not found in specification".format(index['name'],
-																			table.table_name)
-		if len(indexes) > 0:
-			return "table {0} has indexes not found in specification".format(table.table_name)
+					del(indexes[index['name']])
+				else:
+					return "index {0} in table {1} not found in specification".format(index['name'],
+																				table.table_name)
+			if len(indexes) > 0:
+				return "table {0} has indexes not found in specification".format(table.table_name)
 
-		return ""
+			return ""
 
 	def create(self, args):
 		self._validate()
@@ -143,17 +144,18 @@ class Meister:
 
 		throughput = self.table_spec['throughput'] if 'throughput' in self.table_spec else None
 		indexes = []
-		for index in self.table_spec['indexes']:
-			rk_name = index['attribute']['name']
-			rk_type = eval(Meister.types.format(index['attribute']['type']))
-			rangekey = RangeKey(rk_name, rk_type)
-			if 'fields' not in index:
-				indexes.append(AllIndex(index['name'], parts=[hashkey, rangekey]))
-			elif len(index['fields']) <= 0:
-				indexes.append(KeysOnlyIndex(index['name'], parts=[hashkey, rangekey]))
-			else:
-				indexes.append(IncludeIndex(index['name'], parts=[hashkey, rangekey],
-											includes=[field for field in index['fields']]))
+		if 'indexes' in self.table_spec:
+			for index in self.table_spec['indexes']:
+				rk_name = index['attribute']['name']
+				rk_type = eval(Meister.types.format(index['attribute']['type']))
+				rangekey = RangeKey(rk_name, rk_type)
+				if 'fields' not in index:
+					indexes.append(AllIndex(index['name'], parts=[hashkey, rangekey]))
+				elif len(index['fields']) <= 0:
+					indexes.append(KeysOnlyIndex(index['name'], parts=[hashkey, rangekey]))
+				else:
+					indexes.append(IncludeIndex(index['name'], parts=[hashkey, rangekey],
+												includes=[field for field in index['fields']]))
 		table = Table.create(args['destination_table'], schema=schema,
 								throughput=throughput, indexes=indexes, connection=self.connection)
 
@@ -181,59 +183,61 @@ class Meister:
 			if type(item[key]) is list:
 				item[key] = set(item[key])
 
-		for index in self.table_spec['indexes']:
-			attribute = index['attribute']
-			if attribute['type'] == "NUMBER":
-				if 'translation' in attribute:
-					if item[attribute['name']] in attribute['translation']:
-						item[attribute['name']] = Decimal(attribute['translation'][item[attribute['name']]])
-					elif 'default' in attribute:
-						item[attribute['name']] = Decimal(attribute['default'])
-				else:
-					try:
-						item[attribute['name']] = Decimal(item[attribute['name']])
-					except:
-						if 'default' in attribute:
-							item[attribute['name']] = Decimal(item[attribute['default']])
-			elif attribute['type'] == "STRING":
-				if 'translation' in attribute:
-					if item[attribute['name']] in attribute['translation']:
-						item[attribute['name']] = "{0}".format(attribute['translation'][item[attribute['name']]])
-					elif 'default' in attribute:
-						item[attribute['name']] = "{0}".format(attribute['default'])
-				else:
-					try:
-						item[attribute['name']] = "{0}".format(item[attribute['name']])
-					except:
-						if 'default' in attribute:
+		if 'indexes' in self.table_spec:
+			for index in self.table_spec['indexes']:
+				attribute = index['attribute']
+				if attribute['type'] == "NUMBER":
+					if 'translation' in attribute:
+						if item[attribute['name']] in attribute['translation']:
+							item[attribute['name']] = Decimal(attribute['translation'][item[attribute['name']]])
+						elif 'default' in attribute:
+							item[attribute['name']] = Decimal(attribute['default'])
+					else:
+						try:
+							item[attribute['name']] = Decimal(item[attribute['name']])
+						except:
+							if 'default' in attribute:
+								item[attribute['name']] = Decimal(item[attribute['default']])
+				elif attribute['type'] == "STRING":
+					if 'translation' in attribute:
+						if item[attribute['name']] in attribute['translation']:
+							item[attribute['name']] = "{0}".format(attribute['translation'][item[attribute['name']]])
+						elif 'default' in attribute:
 							item[attribute['name']] = "{0}".format(attribute['default'])
-		for index in self.table_spec['transformations']:
-			if index['type'] == "NUMBER":
-				item[index['name']] = Decimal(item[index['name']])
-			elif index['type'] == "NUMBER_SET":
-				fields = set()
-				try:
-					for field in json.loads(item[index['name']]):
-						fields.add(Decimal(field))
-				except TypeError:
-					for field in item[index['name']]:
-						fields.add(Decimal(field))
+					else:
+						try:
+							item[attribute['name']] = "{0}".format(item[attribute['name']])
+						except:
+							if 'default' in attribute:
+								item[attribute['name']] = "{0}".format(attribute['default'])
+		if 'transformations' in self.table_spec:
+			for index in self.table_spec['transformations']:
+				if index['type'] == "NUMBER":
+					item[index['name']] = Decimal(item[index['name']])
+				elif index['type'] == "NUMBER_SET":
+					fields = set()
+					try:
+						for field in json.loads(item[index['name']]):
+							fields.add(Decimal(field))
+					except TypeError:
+						for field in item[index['name']]:
+							fields.add(Decimal(field))
 
-				item[index['name']] = fields
-			elif index['type'] == "STRING":
-				item[index['name']] = "{0}".format(item[index['name']])
-			elif index['type'] == "STRING_SET":
-				fields = set()
-				try:
-					for field in json.loads(item[index['name']]):
-						fields.add("{0}".format(field))
-				except TypeError:
-					for field in item[index['name']]:
-						fields.add("{0}".format(field))
-				item[index['name']] = fields
-			elif index['type'] == "OBSOLETE":
-				if index['name'] in item:
-					del item[index['name']]
+					item[index['name']] = fields
+				elif index['type'] == "STRING":
+					item[index['name']] = "{0}".format(item[index['name']])
+				elif index['type'] == "STRING_SET":
+					fields = set()
+					try:
+						for field in json.loads(item[index['name']]):
+							fields.add("{0}".format(field))
+					except TypeError:
+						for field in item[index['name']]:
+							fields.add("{0}".format(field))
+					item[index['name']] = fields
+				elif index['type'] == "OBSOLETE":
+					if index['name'] in item:
+						del item[index['name']]
 
 		return item
 

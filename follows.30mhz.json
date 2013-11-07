@@ -1,0 +1,33 @@
+{
+	"name": "mytable",
+	"schema": {
+		"hashkey": {
+			"name": "check_id",
+			"type": "STRING"
+		},
+		"rangekey": {
+			"name": "email_address",
+			"type": "STRING"
+		}
+	},
+	"throughput": {
+		"read": 1,
+		"write": 2
+	},
+	"indexes": [
+		{
+			"name": "enabled_index",
+			"attribute": {
+				"name": "enabled",
+				"type": "NUMBER"
+			}
+		},
+		{
+			"name": "owner_index",
+			"attribute": {
+				"name": "owner",
+				"type": "STRING"
+			}
+		}
+	]
+}

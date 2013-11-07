@@ -4,10 +4,6 @@
         "hashkey": {
             "name": "email_address",
             "type": "STRING"
-        },
-        "rangekey": {
-            "name": "phone_number",
-            "type": "STRING"
         }
     },
     "throughput": {
