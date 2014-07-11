@@ -11,7 +11,7 @@
 		}
 	},
 	"throughput": {
-		"read": 1,
+		"read": 4,
 		"write": 2
 	},
 	"indexes": [
@@ -29,5 +29,23 @@
 				"type": "STRING"
 			}
 		}
+	],
+    "global_indexes": [
+		{
+	        "name": "email_address_index",
+	        "hashkey": "email_address",
+	        "throughput": {
+	            "read": 1,
+	            "write": 1
+	        }
+    	},
+		{
+	        "name": "owner_global_index",
+	        "hashkey": "owner",
+	        "throughput": {
+	            "read": 1,
+	            "write": 1
+	        }
+    	}
 	]
 }
