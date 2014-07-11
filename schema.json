@@ -46,6 +46,35 @@
 					"required" : [ "name", "attribute" ]
 				}
 			},
+			"global_indexes" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"properties" : {
+						"name" : { "type" : "string" },
+						"hashkey" : { "type" : "string" },
+						"rangekey" : { "type" : "string" },
+						"fields" : {
+							"type" : "array",
+							"items" : {
+								"properties" : {
+									"name" : { "type" : "string" }
+								},
+								"required" : [ "name" ]
+							}
+                        },
+                        "throughput" : {
+                            "type" : "object",
+                            "properties" : {
+                                "read" : { "type" : "integer" },
+                                "write" : { "type" : "integer" }
+                            },
+                            "required" : [ "read", "write" ]
+						},
+                        "required" : [ "name", "hashkey" ]
+					}
+				}
+			},
 			"transformations" : {
 				"type" : "array",
 				"items" : {
