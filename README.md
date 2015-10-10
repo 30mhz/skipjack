@@ -20,6 +20,16 @@ An example TSL
 
 This is a specification for a very simple DynamoDB table. Look at the examples, and the syntax definition for inspiration. You should be able to express any DynamoDB table structure possible. In addition we can also specify transformations, or in other words, we can enforce types. (Casting simple types, and transforming from json to _SET types, or marking fields OBSOLETE.)
 
+
+Installation
+------------
+
+As usual, with a virtual environment
+
+	virtualenv venv/
+	source venv/bin/activate
+	pip install -r requirements
+
 Use
 ---
 
