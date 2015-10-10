@@ -5,7 +5,7 @@
             "name": "email_address",
             "type": "STRING"
         },
-        "hashkey": {
+        "rangekey": {
             "name": "name",
             "type": "STRING"
         }
